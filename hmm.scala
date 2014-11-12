@@ -28,7 +28,6 @@ case class hmm(p: Array[Double], t: Array[Array[Double]], e: Array[Map[Int, Doub
 		val lengthSentences = new Array[Double](nbSentences)
 		for (i <- 0 until nbSentences) lengthSentences(i) = sentences(i).length
 		val maxLengthSentence = Algos.maxTab(lengthSentences)
-		println(maxLengthSentence)
 		val results = Array.ofDim[Array[Int]](nbSentences)
 
 		var indexSentence = 0
@@ -88,9 +87,9 @@ case class hmm(p: Array[Double], t: Array[Array[Double]], e: Array[Map[Int, Doub
 					errorCount += 1
 				}
 				wordCount += 1
-				println(f"${if (error) "> " else "  "} $word%5d $refCat%2d $hypCat%2d")
+				//println(f"${if (error) "> " else "  "} $word%5d $refCat%2d $hypCat%2d")
 			}
-			println()
+			//println()
 		}
 		return 1 - errorCount.toDouble / wordCount
 	}

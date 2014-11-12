@@ -20,28 +20,18 @@ class Corpus(w: ArrayBuffer[ArrayBuffer[Int]], c: ArrayBuffer[ArrayBuffer[Int]])
 
 	val MIN = -1.0e307
 
-	val initCat: Map[Int, Int] = this.initCategories()
-	val (unigramCat, bigramCat): (Map[Int, Int], Map[(Int, Int), Int]) = this.categoriesOcc()
-	val nbCat = unigramCat.size
-	val wordCategories: Map[Int, Map[Int, Int]] = this.wordCategoriesOcc()
 
-	def initCategories(): Map[Int, Int] = {
+	val (initCat, unigramCat, bigramCat, wordCategories): (Map[Int, Int], Map[Int, Int], Map[(Int, Int), Int], Map[Int, Map[Int, Int]]) = this.build()
+	val nbCat = unigramCat.size
+
+	def build(): (Map[Int, Int], Map[Int, Int], Map[(Int, Int), Int], Map[Int, Map[Int, Int]]) = {
 		var initCat = Map[Int, Int]()
+		var wordCategories = Map[Int, Map[Int, Int]]()
+		var unigramCategories: Map[Int, Int] = Map[Int, Int]()
+		var bigramCategories: Map[(Int, Int), Int] = Map[(Int, Int), Int]()
+
 		for (i <- 0 until this.nbSequences()) {
 			val initCurrentCat: Int = this.categories(i)(0)
-			if (initCat.contains(initCurrentCat)) {
-				initCat(initCurrentCat) += 1
-			}
-			else {
-				initCat += (initCurrentCat -> 1)
-			}
-		}
-		return initCat
-	}
-
-	def wordCategoriesOcc(): Map[Int, Map[Int, Int]] = {
-		var wordCategories = Map[Int, Map[Int, Int]]()
-		for (i <- 0 until this.nbSequences()) {
 			for (j <- 0 until this.words(i).length) {
 				val currentWord = this.words(i)(j)
 				val currentCat = this.categories(i)(j)
@@ -57,15 +47,7 @@ class Corpus(w: ArrayBuffer[ArrayBuffer[Int]], c: ArrayBuffer[ArrayBuffer[Int]])
 					wordCategories += (currentWord -> Map(currentCat -> 1))
 				}
 			}
-		}
-		return wordCategories
-	}
 
-	def categoriesOcc(): (Map[Int, Int], Map[(Int, Int), Int]) = {
-		var unigramCategories: Map[Int, Int] = Map[Int, Int]()
-		var bigramCategories: Map[(Int, Int), Int] = Map[(Int, Int), Int]()
-
-		for (i <- 0 until this.nbSequences()) {
 			for (j <- 0 until this.categories(i).length - 1) {
 				var currentCat = this.categories(i)(j)
 				var nextCat = this.categories(i)(j + 1)
@@ -83,10 +65,15 @@ class Corpus(w: ArrayBuffer[ArrayBuffer[Int]], c: ArrayBuffer[ArrayBuffer[Int]])
 					bigramCategories += ((currentCat, nextCat) -> 1)
 				}
 			}
-		}
 
-		val categoriesOcc: (Map[Int, Int], Map[(Int, Int), Int]) = (unigramCategories, bigramCategories)
-		return categoriesOcc
+			if (initCat.contains(initCurrentCat)) {
+				initCat(initCurrentCat) += 1
+			}
+			else {
+				initCat += (initCurrentCat -> 1)
+			}
+		}
+		return (initCat, unigramCategories, bigramCategories, wordCategories)
 	}
 
 	def probaInit(): Array[Double] = {
@@ -140,11 +127,5 @@ class Corpus(w: ArrayBuffer[ArrayBuffer[Int]], c: ArrayBuffer[ArrayBuffer[Int]])
 		return e
 	}
 
-	def listIndexWords(): List[Int] = {
-		val wordCategories: Map[Int, Map[Int, Int]] = this.wordCategoriesOcc()
-		val words = wordCategories.keys
-		val wordList = words.toList
-		return wordList
-	}
 
 }

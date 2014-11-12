@@ -6,7 +6,6 @@ import scala.io.BufferedSource
 object Test extends App {
 	var fileName = "C:/Users/chate_000/IdeaProjects/Talep/ftb.train.encode"
 	var corpus_train = new Corpus(fileName)
-	println(corpus_train.initCat)
 	var hmmTest = new hmm(corpus_train)
 	var corpus_test = new Corpus("C:/Users/chate_000/IdeaProjects/Talep/ftb.dev.encode")
 	//println(hmmTest.viterbi(corpus_test))
